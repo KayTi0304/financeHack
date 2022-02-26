@@ -1,4 +1,3 @@
-from unicodedata import category
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from urllib.parse import urlencode
