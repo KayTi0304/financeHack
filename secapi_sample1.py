@@ -16,7 +16,7 @@ print(xbrl_json["StatementsOfCashFlows"])
 
 tesla_sample_report = xbrl_json
 f = open("tesla_sample_report.json", "w")
-json.dump(tesla_sample_report, f)
+json.dump(tesla_sample_report, f, indent=4, separators=(',', ': '))
 f.close()
 
 # 10-K XBRL File URL example
