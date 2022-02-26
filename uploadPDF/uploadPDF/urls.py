@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from example.views import upload_file
+from example.views import welcome, display_report
 
 urlpatterns = [
-    path('list/', upload_file, name='list'),
+    path('', welcome, name='welcome'),
+    path('display/', display_report, name='display')
 ]

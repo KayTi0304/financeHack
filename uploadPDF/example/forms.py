@@ -1,4 +1,4 @@
 from django import forms
 
-class uploadFileForms(forms.Form):
-    file = forms.FileField()    
+class companyForm(forms.Form):
+    company_name = forms.CharField(label="Company name", max_length=100)  

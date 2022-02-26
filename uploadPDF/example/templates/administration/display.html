@@ -3,20 +3,11 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Display</title>
+    <title>Upload</title>
 </head>
 
 <body>
-    <ul>
-        {% for key, value in report.items %}
-        <li>
-            <p>{{key}}</p>
-            {% for x in value %}
-            <p>{{x}},</p>
-            {% endfor %}
-        </li>
-        {% endfor %}
-    </ul>
+    <h1>You have requested information from {{ name }}.</h1>
 </body>
 
 </html>
