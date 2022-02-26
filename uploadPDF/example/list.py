@@ -92,3 +92,4 @@ def print_list():
     print(list_index)
 
     print(report.items())
+    return report 

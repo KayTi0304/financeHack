@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Display</title>
+</head>
+
+<body>
+    <ul>
+        {% for key, value in report.items %}
+        <li>
+            <p>{{key}}</p>
+            {% for x in value %}
+            <p>{{x}},</p>
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>

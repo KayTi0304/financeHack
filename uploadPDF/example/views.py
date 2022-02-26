@@ -21,9 +21,11 @@ def upload_file(request):
             f.write('\n')
         f.close()
 
-        print_list()
+        #returning a hashmap<String, List<Integers>>
+        report = print_list()
 
-        return HttpResponse('The name of the uploaded file is ' + str(file))
+        #return HttpResponse('The name of the uploaded file is ' + str(file))
+        return render(request, 'administration/display.html', {'report': report})
     else:
         form = uploadFileForms()
     return render(request, 'administration/upload.html', {'form': form})
