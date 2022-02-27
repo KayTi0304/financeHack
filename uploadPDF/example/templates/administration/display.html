@@ -14,7 +14,7 @@
     </style>
 </head>
 
-<body style="background-color: #364958">
+<body style="background-color: #364958; align-items: center">
     <h1 style="color: #c9e4ca">
         You have requested information from {{ name }}.
     </h1>
@@ -39,6 +39,7 @@
             </td>
             <td style="
             border-right: solid 1rem;
+            color: white;
             border-right-color: white;
             background-color: #3b6064;
             text-align: center;
@@ -56,6 +57,23 @@
         </tr>
         {% endfor %}
     </table>
+    <form action="/" method="GET" enctype="multipart/form-data">
+        {% csrf_token %} {{form}}
+        <button class="btn btn-success" style="
+          margin-left: auto;
+          margin-right: auto;
+          width: auto;
+          background-color: #55828b;
+          border: none;
+          border-radius: 2rem;
+          padding: 0.5rem;
+          font-family: sans-serif;
+          font-weight: 400;
+          color: #c9e4ca;
+        " type="submit" value="Submit">
+        Return
+      </button>
+    </form>
 </body>
 
 </html>
