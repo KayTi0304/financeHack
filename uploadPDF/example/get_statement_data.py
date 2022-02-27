@@ -9,7 +9,7 @@ def getStatementData(userInput):
     user_input = userInput
 
     try:
-        f = open(str(user_input).casefold() + "_report.json", "r")
+        f = open("uploadPDF/Annual_Reports/" + str(user_input).casefold() + "_report.json", "r")
         annual_report = json.load(f)
         f.close()
 
