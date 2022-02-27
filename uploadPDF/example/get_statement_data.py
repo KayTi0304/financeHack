@@ -28,6 +28,10 @@ def getStatementData(userInput):
         filings = queryApi.get_filings(query)
         print(json.dumps(filings, indent=4))
 
+        if filings['filings'] == []:
+            print("Invalid company name!")
+            quit()
+
         annual_report_url = filings['filings'][0]["linkToFilingDetails"]
 
         # 10-K HTM File URL example
@@ -49,11 +53,11 @@ def getStatementData(userInput):
     if "RevenueFromContractWithCustomerExcludingAssessedTax" in income_statement:
         for revenue in income_statement["RevenueFromContractWithCustomerExcludingAssessedTax"]:
             if "segment" not in revenue:
-                simple_data["Revenue"] = float(revenue["value"])
+                simple_data["Revenue"] = round(float(revenue["value"]), 2)
                 break
 
     if "Revenues" in income_statement:
-        simple_data["Revenue"] = float(income_statement["Revenues"][0]["value"])
+        simple_data["Revenue"] = round(float(income_statement["Revenues"][0]["value"]),2)
 
     if "Revenue" not in simple_data:
         simple_data["Revenue"] = None
@@ -61,12 +65,12 @@ def getStatementData(userInput):
 
     #summing other sources of income
     if "OtherIncome" in income_statement:
-        simple_data["Other Income"] = float(income_statement["OtherIncome"][0]["value"])
+        simple_data["Other Income"] = round(float(income_statement["OtherIncome"][0]["value"]),2)
     else:
         simple_data["Other Income"] = 0
 
     if "NonoperatingIncomeExpense" in income_statement:
-        simple_data["Other Income"] += float(income_statement["NonoperatingIncomeExpense"][0]["value"])
+        simple_data["Other Income"] += round(float(income_statement["NonoperatingIncomeExpense"][0]["value"]),2)
 
     if "OtherNonoperatingIncomeExpense" in income_statement:
         simple_data["Other Income"] += float(income_statement["OtherNonoperatingIncomeExpense"][0]["value"])
@@ -86,9 +90,9 @@ def getStatementData(userInput):
 
     #calculating gross profit margin
     try:
-        simple_data["Gross Profit Margin"] = simple_data["Gross Profit"] / simple_data["Revenue"]
+        simple_data["Gross Profit Margin (%)"] = round(simple_data["Gross Profit"] / simple_data["Revenue"] * 100, 2)
     except:
-        simple_data["Gross Profit Margin"] = None
+        simple_data["Gross Profit Margin (%)"] = None
 
 
 
@@ -101,15 +105,15 @@ def getStatementData(userInput):
 
     #calculating net profit margin
     try:
-        simple_data["Net Profit Margin"] = simple_data["Net Income"] / (simple_data["Revenue"] + simple_data["Other Income"])
+        simple_data["Net Profit Margin (%)"] = round(simple_data["Net Income"] / (simple_data["Revenue"] + simple_data["Other Income"]) * 100, 2)
     except:
-        simple_data["Net Profit Margin"] = None
+        simple_data["Net Profit Margin (%) "] = None
 
     #retrieving diluted earnings per share
     if "EarningsPerShareDiluted" in income_statement:
-        simple_data["Earnings Per Share (Diluted)"] = float(income_statement["EarningsPerShareDiluted"][0]["value"])
+        simple_data["Diluted Earnings Per Share ($/Share)"] = "{:.2f}".format(float(income_statement["EarningsPerShareDiluted"][0]["value"]))
     else:
-        simple_data["Earnings Per Share (Diluted)"] = None
+        simple_data["Diluted Earnings Per Share ($/Share)"] = None
 
     #retrieving common stock outstanding
     if "EntityCommonStockSharesOutstanding" in annual_report["CoverPage"]:
@@ -163,18 +167,18 @@ def getStatementData(userInput):
 
     #calculating current ratio
     try:    
-        simple_data["Current Ratio"] = simple_data["Current Assets"] / simple_data["Current Liabilities"]
+        simple_data["Current Ratio"] = round(simple_data["Current Assets"] / simple_data["Current Liabilities"], 2)
     except:
         simple_data["Current Ratio"] = None
 
     #calculating return on equity
     try:
-        simple_data["Return on Equity"] = simple_data["Net Income"] / simple_data["Total Stockholders Equity"]
+        simple_data["Return on Equity"] = round(simple_data["Net Income"] / simple_data["Total Stockholders Equity"], 2)
     except:
         simple_data["Return on Equity"] = None
 
     try:
-        simple_data["Return on Assets"] = simple_data["Net Income"] / simple_data["Total Assets"]
+        simple_data["Return on Assets"] = round(simple_data["Net Income"] / simple_data["Total Assets"], 2)
     except:
         simple_data["Return on Assets"] = None
 
