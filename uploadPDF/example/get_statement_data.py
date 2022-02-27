@@ -8,40 +8,37 @@ xbrlApi = XbrlApi("7d84412d1c2236517aba57d5aab13020072b7eb116b10f3e0855189cd840e
 def getStatementData(userInput):
     user_input = userInput
 
-    query = {
-        "query": {
-            "query_string": {
-                "query": "formType:\"10-K\" AND companyName:" + str(user_input)
-            }
-        },
-        "from": "0",
-        "size": "20",
-        "sort": [{ "filedAt": { "order": "desc" } }]
-    }
+    try:
+        f = open(str(user_input).casefold() + "_report.json", "r")
+        annual_report = json.load(f)
+        f.close()
 
-    filings = queryApi.get_filings(query)
-    print(json.dumps(filings, indent=4))
+    except:
+        query = {
+            "query": {
+                "query_string": {
+                    "query": "formType:\"10-K\" AND companyName:" + str(user_input)
+                }
+            },
+            "from": "0",
+            "size": "20",
+            "sort": [{ "filedAt": { "order": "desc" } }]
+        }
 
-    annual_report_url = filings['filings'][0]["linkToFilingDetails"]
+        filings = queryApi.get_filings(query)
+        print(json.dumps(filings, indent=4))
 
-    # 10-K HTM File URL example
-    xbrl_json = xbrlApi.xbrl_to_json(
-        htm_url=annual_report_url
-    )
+        annual_report_url = filings['filings'][0]["linkToFilingDetails"]
 
-    # access income statement, balance sheet and cash flow statement
-    print(xbrl_json["StatementsOfIncome"])
-    print(xbrl_json["BalanceSheets"])
-    print(xbrl_json["StatementsOfCashFlows"])
+        # 10-K HTM File URL example
+        xbrl_json = xbrlApi.xbrl_to_json(
+            htm_url=annual_report_url
+        )
 
-    annual_report = xbrl_json
-    f = open(str(user_input) + "_report.json", "w")
-    json.dump(annual_report, f, indent=4, separators=(',', ': '))
-    f.close()
-
-    # f = open("tesla_report.json", "r")
-    # annual_report = json.load(f)
-    # f.close()
+        annual_report = xbrl_json
+        f = open("uploadPDF/Annual_Reports/" + str(user_input).casefold() + "_report.json", "w")
+        json.dump(annual_report, f, indent=4, separators=(',', ': '))
+        f.close()
 
     simple_data = {}
 
@@ -49,10 +46,11 @@ def getStatementData(userInput):
 
 
     #retrieving total revenue from income statement
-    for revenue in income_statement["RevenueFromContractWithCustomerExcludingAssessedTax"]:
-        if "segment" not in revenue:
-            simple_data["Revenue"] = float(revenue["value"])
-            break
+    if "RevenueFromContractWithCustomerExcludingAssessedTax" in income_statement:
+        for revenue in income_statement["RevenueFromContractWithCustomerExcludingAssessedTax"]:
+            if "segment" not in revenue:
+                simple_data["Revenue"] = float(revenue["value"])
+                break
 
     if "Revenues" in income_statement:
         simple_data["Revenue"] = float(income_statement["Revenues"][0]["value"])
@@ -86,8 +84,11 @@ def getStatementData(userInput):
             if "CostOf" in key:
                 simple_data["Gross Profit"] = simple_data["Revenue"] - float(income_statement[key][0]["value"])
 
-
-    simple_data["Gross Profit Margin"] = simple_data["Gross Profit"] / simple_data["Revenue"]
+    #calculating gross profit margin
+    try:
+        simple_data["Gross Profit Margin"] = simple_data["Gross Profit"] / simple_data["Revenue"]
+    except:
+        simple_data["Gross Profit Margin"] = None
 
 
 
@@ -97,15 +98,30 @@ def getStatementData(userInput):
     else:
         simple_data["Net Income"] = None
 
-    simple_data["Net Profit Margin"] = simple_data["Net Income"] / (simple_data["Revenue"] + simple_data["Other Income"])
 
+    #calculating net profit margin
+    try:
+        simple_data["Net Profit Margin"] = simple_data["Net Income"] / (simple_data["Revenue"] + simple_data["Other Income"])
+    except:
+        simple_data["Net Profit Margin"] = None
+
+    #retrieving diluted earnings per share
     if "EarningsPerShareDiluted" in income_statement:
         simple_data["Earnings Per Share (Diluted)"] = float(income_statement["EarningsPerShareDiluted"][0]["value"])
     else:
         simple_data["Earnings Per Share (Diluted)"] = None
 
+    #retrieving common stock outstanding
     if "EntityCommonStockSharesOutstanding" in annual_report["CoverPage"]:
-        simple_data["Common Stock Shares Outstanding"] = int(annual_report["CoverPage"]["EntityCommonStockSharesOutstanding"]["value"])
+
+        simple_data["Common Stock Shares Outstanding"] = 0
+
+        if type(annual_report["CoverPage"]["EntityCommonStockSharesOutstanding"]) == list:
+            for dict in annual_report["CoverPage"]["EntityCommonStockSharesOutstanding"]:
+                simple_data["Common Stock Shares Outstanding"] += int(dict["value"])
+        else:
+            simple_data["Common Stock Shares Outstanding"] = int(annual_report["CoverPage"]["EntityCommonStockSharesOutstanding"]["value"])
+
     else:
         simple_data["Common Stock Shares Outstanding"] = None
 
@@ -143,9 +159,24 @@ def getStatementData(userInput):
     else:
         simple_data["Total Liabilities and Stockholders Equity"] = None
 
-    simple_data["Current Ratio"] = simple_data["Current Assets"] / simple_data["Current Liabilities"]
-    simple_data["Return on Equity"] = simple_data["Net Income"] / simple_data["Total Stockholders Equity"]
-    simple_data["Return on Assets"] = simple_data["Net Income"] / simple_data["Total Assets"]
+
+
+    #calculating current ratio
+    try:    
+        simple_data["Current Ratio"] = simple_data["Current Assets"] / simple_data["Current Liabilities"]
+    except:
+        simple_data["Current Ratio"] = None
+
+    #calculating return on equity
+    try:
+        simple_data["Return on Equity"] = simple_data["Net Income"] / simple_data["Total Stockholders Equity"]
+    except:
+        simple_data["Return on Equity"] = None
+
+    try:
+        simple_data["Return on Assets"] = simple_data["Net Income"] / simple_data["Total Assets"]
+    except:
+        simple_data["Return on Assets"] = None
 
     print(simple_data)
     return simple_data
