@@ -4,10 +4,58 @@
 <head>
     <meta charset="utf-8" />
     <title>Upload</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
 </head>
 
-<body>
-    <h1>You have requested information from {{ name }}.</h1>
+<body style="background-color: #364958">
+    <h1 style="color: #c9e4ca">
+        You have requested information from {{ name }}.
+    </h1>
+    <table style="margin-left: auto; margin-right: auto">
+        {% for key, value in sample.items %}
+        <tr style="margin: 3rem">
+            <td style="
+            border-left: solid 1rem;
+            border-left-color: black;
+            background-color: #3b6064;
+            text-align: center;
+            width: auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-bottom: 0.5rem;
+            padding-top: 0.5rem;
+            border-top-left-radius: 1rem;
+            border-bottom-left-radius: 1rem;
+            margin-right: 3rem;
+          ">
+                {{key}}
+            </td>
+            <td style="
+            border-right: solid 1rem;
+            border-right-color: white;
+            background-color: #3b6064;
+            text-align: center;
+            width: fit-content;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-bottom: 0.5rem;
+            padding-top: 0.5rem;
+            border-top-right-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            margin-left: 3rem;
+          ">
+                {{value}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 
 </html>
