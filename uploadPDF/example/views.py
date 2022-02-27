@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from urllib.parse import urlencode
 from django.urls import reverse
 from .forms import companyForm
+from .get_statement_data import getStatementData
 import json
 
 # Create your views here.
@@ -18,12 +19,7 @@ def display_report(request):
         form = companyForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['company_name']
-
-            sample = {
-                "name": name,
-                "GrossProfit": "60000",
-                "NetIncome": "40000"
-            }
+            sample = getStatementData(name)
 
             return render(request, 'administration/display.html', {'sample': sample, 'name': name})
     else:
