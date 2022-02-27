@@ -9,7 +9,7 @@ def getStatementData(userInput):
     user_input = userInput
 
     try:
-        f = open("uploadPDF/Annual_Reports/" + str(user_input).casefold() + "_report.json", "r")
+        f = open("./Annual_Reports/" + str(user_input).casefold() + "_report.json", "r")
         annual_report = json.load(f)
         f.close()
 
@@ -40,7 +40,7 @@ def getStatementData(userInput):
         )
 
         annual_report = xbrl_json
-        f = open("uploadPDF/Annual_Reports/" + str(user_input).casefold() + "_report.json", "w")
+        f = open("./Annual_Reports/" + str(user_input).casefold() + "_report.json", "w")
         json.dump(annual_report, f, indent=4, separators=(',', ': '))
         f.close()
 
